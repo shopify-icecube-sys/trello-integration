@@ -33,11 +33,10 @@ export async function getOrderMetafield(admin: any, id: string) {
             lastName
           }
           m1: metafield(namespace: "custom", key: "delivery_due_date") { value }
-          m2: metafield(namespace: "custom", key: "delivery_due_date-8dd0") { value }
-          m3: metafield(namespace: "custom", key: "delivery_due_date-00b9") { value }
         }
       }
     `;
+
 
 
   console.log("🔥 GRAPHQL QUERY:", query);
@@ -63,9 +62,10 @@ export async function getOrderMetafield(admin: any, id: string) {
     customerName,
     deliveryDate: isDraft
       ? node.metafield?.value
-      : (node.m1?.value || node.m2?.value || node.m3?.value),
+      : node.m1?.value,
     weight: node.totalWeight || 0,
     postcode: node.shippingAddress?.zip || "",
   };
+
 
 }

@@ -33,4 +33,9 @@ scopes = "read_orders,write_orders,read_draft_orders,write_draft_orders,read_cus
 
 
 [auth]
-redirect_urls = [ "https://vubatrello.icecubedev.com/api/auth" ]
+redirect_urls = [
+  "https://vubatrello.icecubedev.com/api/auth",
+  "https://vubatrello.icecubedev.com/api/auth/callback",
+  "https://vubatrello.icecubedev.com/auth/callback"
+]
+

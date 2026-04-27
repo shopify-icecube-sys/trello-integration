@@ -1,12 +1,4 @@
-export function getPreviousDayFormatted(dateStr: string) {
-  let date = new Date(dateStr);
-
-  if (isNaN(date.getTime())) {
-    date = new Date(Date.parse(dateStr));
-  }
-
-  date.setDate(date.getDate() - 1);
-
+export function formatTrelloDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = String(date.getFullYear()).slice(-2);
@@ -16,4 +8,20 @@ export function getPreviousDayFormatted(dateStr: string) {
   });
 
   return `${weekday} ${day}.${month}.${year}`;
+}
+
+export function getPreviousDayFormatted(dateStr: string) {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() - 1);
+  return formatTrelloDate(date);
+}
+
+export function getTodayFormatted() {
+  return formatTrelloDate(new Date());
+}
+
+export function getNextDayFormatted(dateStr: string) {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().split('T')[0]; // Return YYYY-MM-DD
 }

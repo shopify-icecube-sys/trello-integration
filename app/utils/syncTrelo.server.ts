@@ -1,6 +1,6 @@
 import prisma from "../db.server";
 import { getOrderMetafield } from "./shopify.server";
-import { getPreviousDayFormatted } from "./date.server";
+import { getPreviousDayFormatted, getTodayFormatted, getNextDayFormatted } from "./date.server";
 import { getOrCreateList, createCard, updateCard, getBoardCustomFields, updateCustomField } from "./trello.server";
 
 // Cache for Custom Field IDs
@@ -59,9 +59,10 @@ export async function syncToTrello(admin: any, orderId: string, providedDraftOrd
     // ✨ CUSTOM CARD TITLE: "Billy Fisher #1034"
     const cardTitle = finalCustomerName ? `${finalCustomerName} ${name}` : name;
     
-    // 📝 CUSTOM DESCRIPTION: "1034 - Delivery Due Date: 2026-04-30 -"
-    const orderNumberOnly = name.replace("#", "");
-    const cardDesc = `${orderNumberOnly} - Delivery Due Date: ${deliveryDate || "N/A"} -`;
+    // 🚀 SAME DAY LOGIC
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isSameDay = deliveryDate === todayStr;
+    let finalDeliveryDateField = deliveryDate;
 
     console.log(`📦 Order: ${cardTitle}, Delivery Date: ${deliveryDate}, Weight: ${weight}, Postcode: ${postcode}`);
 
@@ -73,12 +74,23 @@ export async function syncToTrello(admin: any, orderId: string, providedDraftOrd
     let listName = "Hold";
 
     if (deliveryDate) {
-      listName = getPreviousDayFormatted(deliveryDate);
+      if (isSameDay) {
+        console.log("🚀 SAME DAY CASE: Staying in TODAY list, setting field to TOMORROW");
+        listName = getTodayFormatted();
+        finalDeliveryDateField = getNextDayFormatted(deliveryDate);
+      } else {
+        listName = getPreviousDayFormatted(deliveryDate);
+      }
       listId = await getOrCreateList(listName);
     } else {
       console.log("⏸️ No date, putting card in 'Hold' list.");
       listId = await getOrCreateList("Hold");
     }
+
+    // 📝 CUSTOM DESCRIPTION
+    const orderNumberOnly = name.replace("#", "");
+    const cardDesc = `${orderNumberOnly} - Delivery Due Date: ${deliveryDate || "N/A"} -`;
+
 
     // 🔍 Find existing card
     const existing = await prisma.trelloSync.findFirst({
@@ -157,10 +169,11 @@ export async function syncToTrello(admin: any, orderId: string, providedDraftOrd
       }
 
       // 📅 Delivery Date Custom Field
-      if (fieldIds.deliveryDate && deliveryDate) {
-        console.log("📅 Syncing Delivery Date Field:", deliveryDate);
-        await updateCustomField(targetCardId, fieldIds.deliveryDate, deliveryDate, 'text');
+      if (fieldIds.deliveryDate && finalDeliveryDateField) {
+        console.log("📅 Syncing Delivery Date Field:", finalDeliveryDateField);
+        await updateCustomField(targetCardId, fieldIds.deliveryDate, finalDeliveryDateField, 'text');
       }
+
     }
 
   } catch (err) {

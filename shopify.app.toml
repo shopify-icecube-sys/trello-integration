@@ -2,7 +2,7 @@
 
 client_id = "33cf53318ffa0f1ff572a0fc8051f516"
 name = "Trello Integration"
-application_url = "https://example.com"
+application_url = "https://vubatrello.icecubedev.com"
 embedded = true
 
 [build]
@@ -33,4 +33,4 @@ scopes = "read_orders,write_orders,read_draft_orders,write_draft_orders,read_cus
 
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://vubatrello.icecubedev.com/api/auth" ]

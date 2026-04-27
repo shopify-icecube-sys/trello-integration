@@ -19,15 +19,8 @@ uri = "/webhooks/orders/create"
 topics = ["orders/updated"]
 uri = "/webhooks/orders/update"
 
-[[webhooks.subscriptions]]
-topics = ["draft_orders/create"]
-uri = "/webhooks/draft-orders/create"
-
-[[webhooks.subscriptions]]
-topics = ["draft_orders/update"]
-uri = "/webhooks/draft-orders/update"
-
 [access_scopes]
+
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_orders,write_orders,read_draft_orders,write_draft_orders,read_customers"
 

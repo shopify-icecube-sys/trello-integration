@@ -8,6 +8,14 @@ export const action = async ({ request }: { request: Request }) => {
   const orderId = payload.admin_graphql_api_id;
   if (!orderId) return new Response("No ID");
 
+  // 💰 PAYMENT STATUS CHECK: Only sync if order is PAID
+  const financialStatus = payload.financial_status;
+  if (financialStatus !== "paid") {
+    console.log(`💰 ORDER UPDATE: ${payload.name} IS ${financialStatus.toUpperCase()}. SKIPPING TRELLO SYNC.`);
+    return new Response("Not paid, skipping sync");
+  }
+
+
   const shopDomain = request.headers.get("X-Shopify-Shop-Domain");
   if (!shopDomain) return new Response("No shop domain");
 
